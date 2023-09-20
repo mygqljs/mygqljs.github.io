@@ -153,14 +153,14 @@ function parseInput(input: string): { value?: any; error?: Error } {
 
 function getInitialValue() {
   return [
-    'import generateGraphQL from "@mygql/graphql"',
+    "import generateGraphQL from '@mygql/graphql'",
     '',
     'generateGraphQL({',
     '  query: {',
     '    countries: {',
     '      $args: {',
     '        filter: {',
-    '          continent: { in: ["AF"] }',
+    "          continent: { in: ['AF'] }",
     '        }',
     '      },',
     '',

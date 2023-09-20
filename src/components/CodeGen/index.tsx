@@ -70,6 +70,7 @@ export default function CodeGen() {
         <blockquote>
           Don't know where to find the GraphQL introspection? Please read:{' '}
           <a
+            className="g-link"
             target="_blank"
             href="https://www.npmjs.com/package/@mygql/codegen#how-to-get-graphql-introspection"
           >
