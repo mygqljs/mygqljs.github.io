@@ -35,7 +35,6 @@ export default function CodeViewer({ lang, value }: Props) {
       ).Prism
 
       if (Prism) {
-        console.log(code)
         Prism.highlightElement(code)
       }
     } else if (container) {
