@@ -25,7 +25,6 @@ export default function CodeEditor({ lang, value, onChange, height }: Props) {
       extensions={extensions}
       onChange={onChange}
       height={height || '400px'}
-      autoFocus
     />
   )
 }

@@ -43,7 +43,14 @@ export default function GraphQL() {
   return (
     <div className={css.container}>
       <div className={css.content}>
-        <h2>Generate GraphQL query from JavaScript object</h2>
+        <h2 id="graphql">
+          <a href="#graphql">Generate GraphQL query from JavaScript object</a>
+        </h2>
+        <p>
+          Try to change argument of the{' '}
+          <code className="g-code">generateGraphQL</code> function, and see the
+          new result.
+        </p>
         <div className={css.inputContainer}>
           <div className={css.left}>
             <div className={css.editor}>
@@ -84,7 +91,7 @@ export default function GraphQL() {
                     }
                   }}
                 >
-                  {copied ? 'Copied!' : 'Copy'}
+                  {copied ? 'Copied!' : 'Copy to Clipboard'}
                 </Button>
               </div>
             )}

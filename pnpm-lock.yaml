@@ -23,6 +23,9 @@ dependencies:
   classnames:
     specifier: ^2.3.2
     version: 2.3.2
+  json5:
+    specifier: ^2.2.3
+    version: 2.2.3
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -1739,7 +1742,6 @@ packages:
     resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
     engines: {node: '>=6'}
     hasBin: true
-    dev: true
 
   /keyv@4.5.3:
     resolution: {integrity: sha512-QCiSav9WaX1PgETJ+SpNnx2PRRapJ/oRSXM4VO5OGYGSjrxbKPVFVhB3l2OCbLCk329N8qyAtsJjSjvVBWzEug==}
