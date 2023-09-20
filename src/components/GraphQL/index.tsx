@@ -47,7 +47,7 @@ export default function GraphQL() {
           <a href="#graphql">Generate GraphQL query from JavaScript object</a>
         </h2>
         <p>
-          Try to change argument of the{' '}
+          Try to change the argument of the{' '}
           <code className="g-code">generateGraphQL</code> function, and see the
           new result.
         </p>
