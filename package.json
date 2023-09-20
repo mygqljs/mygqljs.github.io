@@ -6,12 +6,14 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:docs": "vite build --outDir docs",
     "format": "prettier --write .",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0 --fix",
     "lint-staged": "lint-staged --allow-empty",
     "prepare": "husky install",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "preview:docs": "vite preview --outDir docs"
   },
   "dependencies": {
     "react": "^18.2.0",
