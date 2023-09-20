@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "build:docs": "vite build --outDir docs",
+    "build:docs": "vite build --outDir docs --base https://cdn.jsdelivr.net/gh/mygqljs/mygqljs.github.io/docs/ --emptyOutDir",
     "format": "prettier --write .",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0 --fix",
@@ -16,6 +16,12 @@
     "preview:docs": "vite preview --outDir docs"
   },
   "dependencies": {
+    "@codemirror/lang-javascript": "^6.2.1",
+    "@codemirror/lang-json": "^6.0.1",
+    "@mygql/codegen": "0.0.1-alpha.2",
+    "@mygql/graphql": "0.0.1-alpha.2",
+    "@uiw/react-codemirror": "^4.21.13",
+    "classnames": "^2.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -30,6 +36,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.3.5",
     "husky": "^8.0.3",
+    "less": "^4.2.0",
     "lint-staged": "^13.3.0",
     "prettier": "2.8.8",
     "typescript": "5.1.6",

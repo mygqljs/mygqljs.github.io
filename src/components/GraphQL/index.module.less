@@ -1,0 +1,49 @@
+.container {
+  padding-bottom: 48px;
+}
+
+.content {
+  margin: 0 auto;
+  max-width: var(--max-page-width);
+
+  h2 {
+    font-weight: bold;
+  }
+}
+
+.inputContainer {
+  display: flex;
+}
+
+.left,
+.right {
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: auto;
+  width: calc(50% - 8px);
+}
+
+.sep {
+  width: 16px;
+  flex-shrink: 0;
+}
+
+.editor {
+  border: 1px solid #4a4a4a;
+}
+
+.viewer {
+  overflow: auto;
+  background-color: #272822;
+  border: 1px solid #4a4a4a;
+  height: 400px;
+}
+
+.error {
+  padding: 1em;
+  color: #f92672;
+}
+
+.actions {
+  margin-top: 16px;
+}

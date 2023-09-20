@@ -1,9 +1,10 @@
+import './index.css'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import './index.css'
+import Playground from './components/Playground'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <div style={{ padding: '1rem' }}>Coming soon :)</div>
+    <Playground />
   </React.StrictMode>
 )
