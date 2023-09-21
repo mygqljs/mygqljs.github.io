@@ -4,7 +4,7 @@ import classNames from 'classnames'
 
 export interface Props {
   checked?: boolean
-  onClick?: () => void
+  onChange?: () => void
   children?: React.ReactNode
   style?: React.CSSProperties
   className?: string
@@ -12,14 +12,14 @@ export interface Props {
 
 export default function Checkbox({
   checked,
-  onClick,
+  onChange,
   children,
   style,
   className
 }: Props) {
   return (
     <label className={classNames(css.checkbox, className)} style={style}>
-      <input type="checkbox" checked={checked} onClick={onClick} /> {children}
+      <input type="checkbox" checked={checked} onChange={onChange} /> {children}
     </label>
   )
 }

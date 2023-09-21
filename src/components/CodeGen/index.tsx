@@ -1,4 +1,5 @@
 import JSON5 from 'json5'
+import localforage from 'localforage'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { convertSchema } from '@mygql/codegen/lib/core/convertSchema'
 import type { Introspection } from '@mygql/codegen/lib/types/introspection'
@@ -11,14 +12,19 @@ import Checkbox from '../Checkbox'
 import css from './index.module.less'
 
 export default function CodeGen() {
-  const ref = useRef<{ timer?: number }>({})
+  const ref = useRef<{
+    timer?: number
+    saveTimer?: number
+    input: string
+    options: Options
+  }>({
+    input: '',
+    options: {}
+  })
+  const [ready, setReady] = useState(false)
   const [tab, setTab] = useState<'input' | 'output'>('input')
   const [copied, setCopied] = useState(false)
-  const [input, setInput] = useState(() => {
-    const saved = localStorage.getItem('@mygql/codegen')
-    return saved === null ? getExampleJSON() : saved
-  })
-
+  const [input, setInput] = useState('')
   const [options, setOptions] = useState<Options>({})
 
   const result = useMemo<{
@@ -46,15 +52,48 @@ export default function CodeGen() {
   }, [tab, input, options])
 
   useEffect(() => {
+    Promise.all([
+      localforage.getItem<string>('@mygql/codegen:input').then((res) => {
+        if (typeof res === 'string') {
+          setInput(res)
+        } else {
+          setInput(getExampleJSON())
+        }
+      }),
+      localforage.getItem<Options>('@mygql/codegen:options').then((res) => {
+        if (res) {
+          setOptions(res)
+        }
+      })
+    ]).finally(() => {
+      setReady(true)
+    })
+  }, [])
+
+  useEffect(() => {
+    ref.current.input = input
+    ref.current.options = options
+
     setCopied(false)
 
-    try {
-      JSON5.parse(input)
-      localStorage.setItem('@mygql/codegen', input)
-    } catch (err) {
-      // ignore invalid JSON
+    if (ref.current.saveTimer === undefined) {
+      ref.current.saveTimer = setTimeout(() => {
+        ref.current.saveTimer = undefined
+        const json = ref.current.input
+
+        localforage.setItem('@mygql/codegen:options', ref.current.options)
+
+        try {
+          if (json) {
+            JSON5.parse(json)
+          }
+          localforage.setItem('@mygql/codegen:input', json)
+        } catch (err) {
+          // ignore invalid JSON
+        }
+      }, 300)
     }
-  }, [input])
+  }, [ref, input, options])
 
   return (
     <div className={css.container}>
@@ -103,12 +142,15 @@ export default function CodeGen() {
               <CodeEditor
                 lang="json"
                 value={input}
-                onChange={(value) => {
-                  setInput(value)
-                }}
+                readOnly={!ready}
+                onChange={(val) => setInput(val)}
               />
             </div>
-            <GenOptions options={options} onChange={setOptions} />
+            <GenOptions
+              disabled={!ready}
+              options={options}
+              onChange={setOptions}
+            />
             <div className={css.actions}>
               <Button onClick={() => setTab('output')}>
                 Convert to TypeScript
@@ -120,7 +162,11 @@ export default function CodeGen() {
             <div className={css.output}>
               <CodeEditor lang="ts" value={result.code} readOnly />
             </div>
-            <GenOptions options={options} onChange={setOptions} />
+            <GenOptions
+              disabled={!ready}
+              options={options}
+              onChange={setOptions}
+            />
             <div className={css.actions}>
               <Button
                 onClick={() => {
@@ -142,15 +188,22 @@ export default function CodeGen() {
             </div>
           </>
         )}
+
+        <p className={css.tip}>
+          * Note: Your input will be remembered in your browser's local storage
+          (IndexedDB).
+        </p>
       </div>
     </div>
   )
 }
 
 function GenOptions({
+  disabled,
   options,
   onChange
 }: {
+  disabled?: boolean
   options: Options
   onChange: (options: Options) => void
 }) {
@@ -173,11 +226,13 @@ function GenOptions({
           className={css.option}
           key={key}
           checked={!!options[key]}
-          onClick={() => {
-            onChange({
-              ...options,
-              [key]: !options[key]
-            })
+          onChange={() => {
+            if (!disabled) {
+              onChange({
+                ...options,
+                [key]: !options[key]
+              })
+            }
           }}
         >
           {key}

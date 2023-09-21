@@ -1,19 +1,19 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import CodeEditor from '../CodeEditor'
 import generateGraphQL from '@mygql/graphql'
 import CodeViewer from '../CodeViewer'
 import css from './index.module.less'
 import Button from '../Button'
 import copyToClipboard from '@/utils/copyToClipboard'
+import localforage from 'localforage'
 
 export default function GraphQL() {
-  const [input, setInput] = useState(() => {
-    const saved = localStorage.getItem('@mygql/graphql')
-    return saved === null ? getInitialValue() : saved
+  const ref = useRef<{ timer?: number; saveTimer?: number; input: string }>({
+    input: ''
   })
-
+  const [input, setInput] = useState('')
+  const [ready, setReady] = useState(false)
   const [copied, setCopied] = useState(false)
-  const ref = useRef<{ timer?: number }>({})
 
   const onChange = useCallback((value: string) => {
     setInput(value)
@@ -23,22 +23,47 @@ export default function GraphQL() {
   const { error, value } = useMemo<{ error?: string; value?: string }>(() => {
     const { value, error } = parseInput(input)
 
+    const save = () => {
+      ref.current.input = input
+      if (ref.current.saveTimer === undefined) {
+        ref.current.saveTimer = setTimeout(() => {
+          ref.current.saveTimer = undefined
+          localforage.setItem('@mygql/graphql:input', ref.current.input)
+        }, 300)
+      }
+    }
+
     if (error) {
       return { error: `${error.message || 'unknown error.'}` }
     } else if (value) {
       try {
         const query = generateGraphQL(value)
-        localStorage.setItem('@mygql/graphql', input)
+        save()
         return { value: query }
       } catch (err) {
         return { error: `${(err as Error).message || 'unknown error.'}` }
       }
     } else {
-      localStorage.setItem('@mygql/graphql', input)
+      save()
     }
 
     return {}
-  }, [input])
+  }, [ref, input])
+
+  useEffect(() => {
+    localforage
+      .getItem<string>('@mygql/graphql:input')
+      .then((res) => {
+        if (typeof res === 'string') {
+          setInput(res)
+        } else {
+          setInput(getInitialValue())
+        }
+      })
+      .finally(() => {
+        setReady(true)
+      })
+  }, [])
 
   return (
     <div className={css.container}>
@@ -54,7 +79,12 @@ export default function GraphQL() {
         <div className={css.inputContainer}>
           <div className={css.left}>
             <div className={css.editor}>
-              <CodeEditor value={input} onChange={onChange} height="400px" />
+              <CodeEditor
+                value={input}
+                onChange={onChange}
+                readOnly={!ready}
+                height="400px"
+              />
             </div>
             <div className={css.actions}>
               <Button
@@ -97,6 +127,10 @@ export default function GraphQL() {
             )}
           </div>
         </div>
+        <p className={css.tip}>
+          * Note: Your input will be remembered in your browser's local storage
+          (IndexedDB).
+        </p>
       </div>
     </div>
   )
