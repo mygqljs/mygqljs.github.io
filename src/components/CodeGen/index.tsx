@@ -1,18 +1,18 @@
+import JSON5 from 'json5'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { convertSchema } from '@mygql/codegen/lib/core/convertSchema'
+import type { Introspection } from '@mygql/codegen/lib/types/introspection'
 import CodeEditor from '../CodeEditor'
 import CodeViewer from '../CodeViewer'
 import example from './example.json'
-import JSON5 from 'json5'
-import type { Introspection } from '@mygql/codegen/lib/types/introspection'
-import { convertSchema } from '@mygql/codegen/lib/core/convertSchema'
-import css from './index.module.less'
 import Button from '../Button'
 import copyToClipboard from '@/utils/copyToClipboard'
+import css from './index.module.less'
 
 export default function CodeGen() {
+  const ref = useRef<{ timer?: number }>({})
   const [tab, setTab] = useState<'input' | 'output'>('input')
   const [copied, setCopied] = useState(false)
-  const ref = useRef<{ timer?: number }>({})
   const [input, setInput] = useState(() => {
     const saved = localStorage.getItem('@mygql/codegen')
     return saved === null ? getExampleJSON() : saved
@@ -21,11 +21,11 @@ export default function CodeGen() {
   const result = useMemo<{
     error?: string
     code?: string
-  } | null>(() => {
+    time?: number
+  }>(() => {
     if (tab === 'output') {
       try {
         const intro = JSON5.parse(input) as Introspection
-
         if (intro && intro.data && intro.data.__schema) {
           const { code } = convertSchema(intro.data.__schema)
           return { code }
@@ -38,14 +38,13 @@ export default function CodeGen() {
         }
         return { error: 'Something went wrong :(' }
       }
-    } else {
-      setCopied(false)
     }
-
-    return null
+    return {}
   }, [tab, input])
 
   useEffect(() => {
+    setCopied(false)
+
     try {
       JSON5.parse(input)
       localStorage.setItem('@mygql/codegen', input)
@@ -115,16 +114,16 @@ export default function CodeGen() {
         ) : (
           <>
             <div className={css.output}>
-              {result?.code && <CodeViewer lang="ts" value={result.code} />}
+              <CodeViewer lang="ts" value={result.code} />
             </div>
             <div className={css.actions}>
               <Button
                 onClick={() => {
-                  if (result?.code) {
+                  if (result.code) {
                     if (ref.current.timer !== undefined) {
                       clearTimeout(ref.current.timer)
                     }
-                    copyToClipboard(result?.code).then(() => {
+                    copyToClipboard(result.code).then(() => {
                       setCopied(true)
                       ref.current.timer = setTimeout(() => {
                         setCopied(false)
