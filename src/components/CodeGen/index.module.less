@@ -45,18 +45,26 @@
   margin-right: 8px;
   flex-grow: 0;
   flex-shrink: 0;
-  background-color: lighten(#e5e7eb, 7%);
+  background-color: lighten(#e5e7eb, 5%);
+  opacity: 0.7;
+  color: #222;
+  transition-property: color, background-color, opacity;
+  transition-duration: 300ms;
+  transition-timing-function: ease-out;
 
   &:hover {
-    background-color: lighten(#e5e7eb, 5%);
+    opacity: 0.85;
+    background-color: lighten(#e5e7eb, 3%);
   }
 
   &:active {
+    opacity: 1;
     background-color: lighten(#e5e7eb, 2%);
   }
 
   &[data-active='true'] {
     background-color: #e5e7eb;
+    opacity: 1;
   }
 }
 

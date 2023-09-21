@@ -84,14 +84,14 @@ export default function CodeGen() {
             data-active={tab === 'input'}
             onClick={() => setTab('input')}
           >
-            Input
+            <b>Input</b> (json)
           </div>
           <div
             className={css.tab}
             data-active={tab === 'output'}
             onClick={() => setTab('output')}
           >
-            Output
+            <b>Output</b> (ts)
           </div>
         </div>
 
