@@ -1,20 +1,13 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
-import copyToClipboard from '@/utils/copyToClipboard'
+import { useMemo, useState } from 'react'
 import generateGraphQL from '@mygql/graphql'
 import CodeEditor from '../CodeEditor'
 import CodeViewer from '../CodeViewer'
 import Button from '../Button'
 import css from './index.module.less'
+import CopyButton from '../CopyButton'
 
 export default function GraphQL() {
-  const ref = useRef<{ timer?: number }>({})
   const [input, setInput] = useState(getInitialValue)
-  const [copied, setCopied] = useState(false)
-
-  const onChange = useCallback((value: string) => {
-    setInput(value)
-    setCopied(false)
-  }, [])
 
   const { error, value } = useMemo<{ error?: string; value?: string }>(() => {
     const { value, error } = parseInput(input)
@@ -47,10 +40,19 @@ export default function GraphQL() {
         <div className={css.inputContainer}>
           <div className={css.left}>
             <div className={css.editor}>
-              <CodeEditor value={input} onChange={onChange} height="400px" />
+              <CodeEditor
+                value={input}
+                onChange={(val) => setInput(val)}
+                height="400px"
+              />
             </div>
             <div className={css.actions}>
-              <Button onClick={() => setInput(getInitialValue())}>Reset</Button>
+              <Button
+                type="primary"
+                onClick={() => setInput(getInitialValue())}
+              >
+                Reset
+              </Button>
             </div>
           </div>
           <div className={css.sep}></div>
@@ -63,23 +65,7 @@ export default function GraphQL() {
             </div>
             {value && (
               <div className={css.actions}>
-                <Button
-                  onClick={() => {
-                    if (value) {
-                      if (ref.current.timer !== undefined) {
-                        clearTimeout(ref.current.timer)
-                      }
-                      copyToClipboard(value).then(() => {
-                        setCopied(true)
-                        ref.current.timer = setTimeout(() => {
-                          setCopied(false)
-                        }, 3000)
-                      })
-                    }
-                  }}
-                >
-                  {copied ? 'Copied!' : 'Copy to Clipboard'}
-                </Button>
+                <CopyButton value={value} />
               </div>
             )}
           </div>

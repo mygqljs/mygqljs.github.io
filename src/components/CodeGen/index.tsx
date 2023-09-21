@@ -1,19 +1,19 @@
 import JSON5 from 'json5'
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { convertSchema } from '@mygql/codegen/lib/core/convertSchema'
 import type { Introspection } from '@mygql/codegen/lib/types/introspection'
 import type { Options } from '@mygql/codegen/lib/types/options'
 import CodeEditor from '../CodeEditor'
 import example from './example.json'
 import Button from '../Button'
-import copyToClipboard from '@/utils/copyToClipboard'
 import Checkbox from '../Checkbox'
 import css from './index.module.less'
+import ModalWindow from '../ModalWindow'
+import CodeViewer from '../CodeViewer'
+import CopyButton from '../CopyButton'
 
 export default function CodeGen() {
-  const ref = useRef<{ timer?: number }>({})
   const [tab, setTab] = useState<'input' | 'output'>('input')
-  const [copied, setCopied] = useState(false)
   const [input, setInput] = useState(getExampleJSON)
   const [options, setOptions] = useState<Options>({})
 
@@ -54,16 +54,7 @@ export default function CodeGen() {
           code.
         </p>
 
-        <blockquote>
-          Don't know where to find the GraphQL introspection? Please read:{' '}
-          <a
-            className="g-link"
-            target="_blank"
-            href="https://www.npmjs.com/package/@mygql/codegen#how-to-get-graphql-introspection"
-          >
-            How to get GraphQL introspection?
-          </a>
-        </blockquote>
+        <IntrospectionTip />
 
         <div className={css.tabs}>
           <div
@@ -88,15 +79,12 @@ export default function CodeGen() {
               <CodeEditor
                 lang="json"
                 value={input}
-                onChange={(val) => {
-                  setCopied(false)
-                  setInput(val)
-                }}
+                onChange={(val) => setInput(val)}
               />
             </div>
             <GenOptions options={options} onChange={setOptions} />
             <div className={css.actions}>
-              <Button onClick={() => setTab('output')}>
+              <Button type="primary" onClick={() => setTab('output')}>
                 Convert to TypeScript
               </Button>
             </div>
@@ -108,23 +96,7 @@ export default function CodeGen() {
             </div>
             <GenOptions options={options} onChange={setOptions} />
             <div className={css.actions}>
-              <Button
-                onClick={() => {
-                  if (result.code) {
-                    if (ref.current.timer !== undefined) {
-                      clearTimeout(ref.current.timer)
-                    }
-                    copyToClipboard(result.code).then(() => {
-                      setCopied(true)
-                      ref.current.timer = setTimeout(() => {
-                        setCopied(false)
-                      }, 3000)
-                    })
-                  }
-                }}
-              >
-                {copied ? 'Copied!' : 'Copy to Clipboard'}
-              </Button>
+              <CopyButton value={result.code} />
             </div>
           </>
         )}
@@ -177,6 +149,152 @@ function GenOptions({
   )
 }
 
+function IntrospectionTip() {
+  const [visible, setVisible] = useState(false)
+  return (
+    <>
+      <blockquote>
+        If you don't know where to find the GraphQL introspection,{' '}
+        <a
+          className="g-link"
+          onClick={() => {
+            setVisible(true)
+          }}
+        >
+          you can click here to get help
+        </a>
+        .
+      </blockquote>
+
+      <ModalWindow
+        visible={visible}
+        title="How to get GraphQL introspection?"
+        hideFooter
+        noScrollBody
+      >
+        <div className={css.tip}>
+          You can use the following GraphQL code to query the introspection:
+        </div>
+        <div className={css.introspectionQuery}>
+          <CodeViewer value={IntrospectionQuery} lang="graphql" />
+        </div>
+        <div className={css.modalActions}>
+          <Button
+            onClick={() => {
+              setVisible(false)
+            }}
+          >
+            Close
+          </Button>
+          <CopyButton value={IntrospectionQuery} />
+        </div>
+      </ModalWindow>
+    </>
+  )
+}
+
 function getExampleJSON() {
   return JSON.stringify(example, null, 2)
 }
+
+const IntrospectionQuery = `
+query IntrospectionQuery {
+  __schema {
+    queryType {
+      name
+    }
+    mutationType {
+      name
+    }
+    subscriptionType {
+      name
+    }
+    types {
+      ...FullType
+    }
+    directives {
+      name
+      description
+      locations
+      args {
+        ...InputValue
+      }
+    }
+  }
+}
+
+fragment FullType on __Type {
+  kind
+  name
+  description
+  fields(includeDeprecated: true) {
+    name
+    description
+    args {
+      ...InputValue
+    }
+    type {
+      ...TypeRef
+    }
+    isDeprecated
+    deprecationReason
+  }
+  inputFields {
+    ...InputValue
+  }
+  interfaces {
+    ...TypeRef
+  }
+  enumValues(includeDeprecated: true) {
+    name
+    description
+    isDeprecated
+    deprecationReason
+  }
+  possibleTypes {
+    ...TypeRef
+  }
+}
+
+fragment InputValue on __InputValue {
+  name
+  description
+  type {
+    ...TypeRef
+  }
+  defaultValue
+}
+
+fragment TypeRef on __Type {
+  kind
+  name
+  ofType {
+    kind
+    name
+    ofType {
+      kind
+      name
+      ofType {
+        kind
+        name
+        ofType {
+          kind
+          name
+          ofType {
+            kind
+            name
+            ofType {
+              kind
+              name
+              ofType {
+                kind
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+`.trim()
