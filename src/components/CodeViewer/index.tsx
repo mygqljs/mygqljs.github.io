@@ -8,6 +8,7 @@ export interface Props {
 
 export default function CodeViewer({ lang, value }: Props) {
   const ref = useRef<HTMLDivElement>(null)
+  const renderRef = useRef({ id: 0 })
 
   useEffect(() => {
     const container = ref.current
@@ -35,7 +36,17 @@ export default function CodeViewer({ lang, value }: Props) {
       ).Prism
 
       if (Prism) {
-        Prism.highlightElement(code)
+        renderRef.current.id += 1
+        if (value.length > 50_000) {
+          const renderId = renderRef.current.id
+          setTimeout(() => {
+            if (renderId === renderRef.current.id) {
+              Prism.highlightElement(code)
+            }
+          }, 30)
+        } else {
+          Prism.highlightElement(code)
+        }
       }
     } else if (container) {
       container.innerHTML = ''
