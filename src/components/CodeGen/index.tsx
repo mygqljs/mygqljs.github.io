@@ -4,7 +4,6 @@ import { convertSchema } from '@mygql/codegen/lib/core/convertSchema'
 import type { Introspection } from '@mygql/codegen/lib/types/introspection'
 import type { Options } from '@mygql/codegen/lib/types/options'
 import CodeEditor from '../CodeEditor'
-import CodeViewer from '../CodeViewer'
 import example from './example.json'
 import Button from '../Button'
 import copyToClipboard from '@/utils/copyToClipboard'
@@ -94,7 +93,7 @@ export default function CodeGen() {
             data-active={tab === 'output'}
             onClick={() => setTab('output')}
           >
-            <b>Output</b> (ts)
+            <b>Output</b> (ts readonly)
           </div>
         </div>
 
@@ -119,7 +118,7 @@ export default function CodeGen() {
         ) : (
           <>
             <div className={css.output}>
-              <CodeViewer lang="ts" value={result.code} />
+              <CodeEditor lang="ts" value={result.code} readOnly />
             </div>
             <GenOptions options={options} onChange={setOptions} />
             <div className={css.actions}>

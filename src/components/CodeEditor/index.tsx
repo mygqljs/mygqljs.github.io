@@ -10,9 +10,16 @@ export interface Props {
   value?: string
   onChange?: (value: string, viewUpdate: ViewUpdate) => void
   height?: string
+  readOnly?: boolean
 }
 
-export default function CodeEditor({ lang, value, onChange, height }: Props) {
+export default function CodeEditor({
+  lang,
+  value,
+  onChange,
+  height,
+  readOnly
+}: Props) {
   const extensions = useMemo(
     () => [lang === 'json' ? json() : javascript({ typescript: true })],
     [lang]
@@ -25,6 +32,7 @@ export default function CodeEditor({ lang, value, onChange, height }: Props) {
       extensions={extensions}
       onChange={onChange}
       height={height || '400px'}
+      readOnly={readOnly}
     />
   )
 }
