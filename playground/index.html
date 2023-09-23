@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MyGQL Playground - Try MyGQL Online.</title>
+    <meta
+      name="description"
+      content="You can try MyGQL here online without install any package from the NPM registry."
+    />
+    <link rel="stylesheet" href="/static/prism.css" />
+    <script src="/static/prism.js"></script>
+  </head>
+  <body>
+    <div class="g-content">
+      <h1>MyGQL Playground</h1>
+      <p>
+        You can try MyGQL here online without install any package from the NPM
+        registry.
+        <a class="g-link" href="/"
+          >To get started with MyGQL, you can click here to read the docs.</a
+        >
+      </p>
+    </div>
+    <div id="root">
+      <div class="g-content">
+        <div class="g-loading">
+          <div>
+            <svg width="24" height="24" viewBox="0 0 24 24">
+              <path
+                d="M16 16L19 19M18 12H22M8 8L5 5M16 8L19 5M8 16L5 19M2 12H6M12 2V6M12 18V22"
+                stroke="black"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <p>Loading playground...</p>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/playground.tsx"></script>
+  </body>
+</html>
