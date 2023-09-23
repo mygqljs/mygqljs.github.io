@@ -1,4 +1,5 @@
 import './home.less'
+
 const Prism = (
   window as {
     Prism?: {
@@ -6,8 +7,6 @@ const Prism = (
     }
   }
 ).Prism
-
-console.log(Prism)
 
 document.querySelectorAll('pre').forEach((pre) => {
   if (pre.className.includes('language-')) {

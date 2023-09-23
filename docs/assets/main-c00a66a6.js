@@ -1,0 +1,1 @@
+import"./modulepreload-polyfill-3cfb730f.js";const e=window.Prism;document.querySelectorAll("pre").forEach(l=>{l.className.includes("language-")&&(e==null||e.highlightElement(l),l.classList.add("g-highlight"))});
