@@ -117,7 +117,7 @@ function GenOptions({
   const keys: (keyof Options)[] = [
     'skipGeneratedTip',
     'skipLintComments',
-    'skipWrappingArgsEnum',
+    'skipWrappingEnum',
     'skipArgs',
     'skipFields',
     'skipFactory',
