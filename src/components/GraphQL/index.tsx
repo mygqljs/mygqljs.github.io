@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import generateGraphQL from '@mygql/graphql'
+import { generateQuery } from 'generate-graphql-query'
 import CodeEditor from '../CodeEditor'
 import CodeViewer from '../CodeViewer'
 import Button from '../Button'
@@ -16,7 +16,7 @@ export default function GraphQL() {
       return { error: `${error.message || 'unknown error.'}` }
     } else if (value) {
       try {
-        const query = generateGraphQL(value)
+        const query = generateQuery(value)
         return { value: query }
       } catch (err) {
         return { error: `${(err as Error).message || 'unknown error.'}` }
@@ -34,7 +34,7 @@ export default function GraphQL() {
         </h2>
         <p>
           Try to change the argument of the{' '}
-          <code className="g-code">generateGraphQL</code> function, and see the
+          <code className="g-code">generateQuery</code> function, and see the
           new result.
         </p>
         <div className={css.inputContainer}>
@@ -80,7 +80,7 @@ function parseInput(input: string): { value?: any; error?: Error } {
   let i = 0
 
   for (i = 0; i < lines.length; i += 1) {
-    if (lines[i].replace(/\s+/g, '').startsWith('generateGraphQL({')) {
+    if (lines[i].replace(/\s+/g, '').startsWith('generateQuery({')) {
       break
     }
   }
@@ -105,7 +105,7 @@ function parseInput(input: string): { value?: any; error?: Error } {
   if (inputCode) {
     const code = [
       '(function () { ',
-      '  return function (generateGraphQL) {',
+      '  return function (generateQuery) {',
       inputCode,
       '  }',
       '})()'
@@ -126,9 +126,9 @@ function parseInput(input: string): { value?: any; error?: Error } {
 
 function getInitialValue() {
   return [
-    "import generateGraphQL from '@mygql/graphql'",
+    "import { generateQuery } from 'generate-graphql-query'",
     '',
-    'generateGraphQL({',
+    'generateQuery({',
     '  query: {',
     '    countries: {',
     '      $args: {',

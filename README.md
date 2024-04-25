@@ -1,3 +1,3 @@
-# MyGQL Playground
+# GraphQL Toolkit Playground
 
-[Click here to try MyGQL online.](https://mygqljs.github.io/)
+[Click here to try GraphQL Toolkit online.](https://mygqljs.github.io/)

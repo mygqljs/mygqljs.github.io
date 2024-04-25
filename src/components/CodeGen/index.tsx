@@ -1,8 +1,8 @@
 import JSON5 from 'json5'
 import { useMemo, useState } from 'react'
-import { convertSchema } from '@mygql/codegen/lib/core/convertSchema'
-import type { Introspection } from '@mygql/codegen/lib/types/introspection'
-import type { Options } from '@mygql/codegen/lib/types/options'
+import { convertSchema } from 'generate-graphql-client/lib/core/convertSchema'
+import type { Introspection } from 'generate-graphql-client/lib/types/introspection'
+import type { Options } from 'generate-graphql-client/lib/types/options'
 import CodeEditor from '../CodeEditor'
 import example from './example.json'
 import Button from '../Button'
@@ -124,7 +124,8 @@ function GenOptions({
     'skipQuery',
     'skipQueries',
     'skipMutation',
-    'skipMutations'
+    'skipMutations',
+    'sortTypes'
   ]
   return (
     <div className={css.options}>
