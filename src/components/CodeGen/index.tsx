@@ -6,6 +6,8 @@ import example from './example.json'
 import Button from '../Button'
 import css from './index.module.less'
 import CopyButton from '../CopyButton'
+import ModalWindow from '../ModalWindow'
+import CodeViewer from '../CodeViewer'
 
 export default function CodeGen() {
   const [tab, setTab] = useState<'input' | 'output'>('input')
@@ -49,6 +51,8 @@ export default function CodeGen() {
           Input your GraphQL introspection JSON to convert it to TypeScript
           code.
         </p>
+
+        <IntrospectionTip />
 
         <div className={css.tabs}>
           <div
@@ -99,4 +103,148 @@ export default function CodeGen() {
 
 function getExampleJSON() {
   return JSON.stringify(example, null, 2)
+}
+
+const IntrospectionQuery = `query IntrospectionQuery {
+  __schema {
+    queryType {
+      name
+    }
+    mutationType {
+      name
+    }
+    subscriptionType {
+      name
+    }
+    types {
+      ...FullType
+    }
+    directives {
+      name
+      description
+      locations
+      args {
+        ...InputValue
+      }
+    }
+  }
+}
+
+fragment FullType on __Type {
+  kind
+  name
+  description
+  fields(includeDeprecated: true) {
+    name
+    description
+    args {
+      ...InputValue
+    }
+    type {
+      ...TypeRef
+    }
+    isDeprecated
+    deprecationReason
+  }
+  inputFields {
+    ...InputValue
+  }
+  interfaces {
+    ...TypeRef
+  }
+  enumValues(includeDeprecated: true) {
+    name
+    description
+    isDeprecated
+    deprecationReason
+  }
+  possibleTypes {
+    ...TypeRef
+  }
+}
+
+fragment InputValue on __InputValue {
+  name
+  description
+  type {
+    ...TypeRef
+  }
+  defaultValue
+}
+
+fragment TypeRef on __Type {
+  kind
+  name
+  ofType {
+    kind
+    name
+    ofType {
+      kind
+      name
+      ofType {
+        kind
+        name
+        ofType {
+          kind
+          name
+          ofType {
+            kind
+            name
+            ofType {
+              kind
+              name
+              ofType {
+                kind
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`
+
+function IntrospectionTip() {
+  const [visible, setVisible] = useState(false)
+  return (
+    <>
+      <blockquote>
+        If you don't know where to find the GraphQL introspection,{' '}
+        <a
+          className="g-link"
+          onClick={() => {
+            setVisible(true)
+          }}
+        >
+          you can click here to get help
+        </a>
+        .
+      </blockquote>
+
+      <ModalWindow
+        visible={visible}
+        title="How to get GraphQL introspection?"
+        hideFooter
+        noScrollBody
+      >
+        <div className={css.tip}>
+          You can use the following GraphQL code to query the introspection:
+        </div>
+        <div className={css.introspectionQuery}>
+          <CodeViewer value={IntrospectionQuery} lang="graphql" />
+        </div>
+        <div className={css.modalActions}>
+          <Button
+            onClick={() => {
+              setVisible(false)
+            }}
+          >
+            Close
+          </Button>
+          <CopyButton value={IntrospectionQuery} />
+        </div>
+      </ModalWindow>
+    </>
+  )
 }
