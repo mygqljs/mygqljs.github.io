@@ -1,21 +1,15 @@
 import JSON5 from 'json5'
 import { useMemo, useState } from 'react'
-import { convertSchema } from 'generate-graphql-client/lib/core/convertSchema'
-import type { Introspection } from 'generate-graphql-client/lib/types/introspection'
-import type { Options } from 'generate-graphql-client/lib/types/options'
+import { convertSchema } from 'generate-graphql-client'
 import CodeEditor from '../CodeEditor'
 import example from './example.json'
 import Button from '../Button'
-import Checkbox from '../Checkbox'
 import css from './index.module.less'
-import ModalWindow from '../ModalWindow'
-import CodeViewer from '../CodeViewer'
 import CopyButton from '../CopyButton'
 
 export default function CodeGen() {
   const [tab, setTab] = useState<'input' | 'output'>('input')
   const [input, setInput] = useState(getExampleJSON)
-  const [options, setOptions] = useState<Options>({})
 
   const result = useMemo<{
     error?: string
@@ -24,10 +18,10 @@ export default function CodeGen() {
   }>(() => {
     if (tab === 'output') {
       try {
-        const intro = JSON5.parse(input) as Introspection
+        const intro = JSON5.parse(input)
         if (intro && intro.data && intro.data.__schema) {
-          const { code } = convertSchema(intro.data.__schema, options)
-          return { code }
+          const ctx = convertSchema(intro.data.__schema, {})
+          return { code: ctx.getCode() }
         } else {
           return { error: 'The input is a introspection JSON.' }
         }
@@ -39,7 +33,9 @@ export default function CodeGen() {
       }
     }
     return {}
-  }, [tab, input, options])
+  }, [tab, input])
+
+  console.log(result)
 
   return (
     <div className={css.container}>
@@ -53,8 +49,6 @@ export default function CodeGen() {
           Input your GraphQL introspection JSON to convert it to TypeScript
           code.
         </p>
-
-        <IntrospectionTip />
 
         <div className={css.tabs}>
           <div
@@ -82,7 +76,6 @@ export default function CodeGen() {
                 onChange={(val) => setInput(val)}
               />
             </div>
-            <GenOptions options={options} onChange={setOptions} />
             <div className={css.actions}>
               <Button type="primary" onClick={() => setTab('output')}>
                 Convert to TypeScript
@@ -94,7 +87,6 @@ export default function CodeGen() {
             <div className={css.output}>
               <CodeEditor lang="ts" value={result.code} readOnly />
             </div>
-            <GenOptions options={options} onChange={setOptions} />
             <div className={css.actions}>
               <CopyButton value={result.code} />
             </div>
@@ -105,197 +97,6 @@ export default function CodeGen() {
   )
 }
 
-function GenOptions({
-  disabled,
-  options,
-  onChange
-}: {
-  disabled?: boolean
-  options: Options
-  onChange: (options: Options) => void
-}) {
-  const keys: (keyof Options)[] = [
-    'skipGeneratedTip',
-    'skipLintComments',
-    'skipWrappingEnum',
-    'skipArgs',
-    'skipFields',
-    'skipFactory',
-    'skipQuery',
-    'skipQueries',
-    'skipMutation',
-    'skipMutations',
-    'sortTypes'
-  ]
-  return (
-    <div className={css.options}>
-      {keys.map((key) => (
-        <Checkbox
-          className={css.option}
-          key={key}
-          checked={!!options[key]}
-          onChange={() => {
-            if (!disabled) {
-              onChange({
-                ...options,
-                [key]: !options[key]
-              })
-            }
-          }}
-        >
-          {key}
-        </Checkbox>
-      ))}
-    </div>
-  )
-}
-
-function IntrospectionTip() {
-  const [visible, setVisible] = useState(false)
-  return (
-    <>
-      <blockquote>
-        If you don't know where to find the GraphQL introspection,{' '}
-        <a
-          className="g-link"
-          onClick={() => {
-            setVisible(true)
-          }}
-        >
-          you can click here to get help
-        </a>
-        .
-      </blockquote>
-
-      <ModalWindow
-        visible={visible}
-        title="How to get GraphQL introspection?"
-        hideFooter
-        noScrollBody
-      >
-        <div className={css.tip}>
-          You can use the following GraphQL code to query the introspection:
-        </div>
-        <div className={css.introspectionQuery}>
-          <CodeViewer value={IntrospectionQuery} lang="graphql" />
-        </div>
-        <div className={css.modalActions}>
-          <Button
-            onClick={() => {
-              setVisible(false)
-            }}
-          >
-            Close
-          </Button>
-          <CopyButton value={IntrospectionQuery} />
-        </div>
-      </ModalWindow>
-    </>
-  )
-}
-
 function getExampleJSON() {
   return JSON.stringify(example, null, 2)
 }
-
-const IntrospectionQuery = `
-query IntrospectionQuery {
-  __schema {
-    queryType {
-      name
-    }
-    mutationType {
-      name
-    }
-    subscriptionType {
-      name
-    }
-    types {
-      ...FullType
-    }
-    directives {
-      name
-      description
-      locations
-      args {
-        ...InputValue
-      }
-    }
-  }
-}
-
-fragment FullType on __Type {
-  kind
-  name
-  description
-  fields(includeDeprecated: true) {
-    name
-    description
-    args {
-      ...InputValue
-    }
-    type {
-      ...TypeRef
-    }
-    isDeprecated
-    deprecationReason
-  }
-  inputFields {
-    ...InputValue
-  }
-  interfaces {
-    ...TypeRef
-  }
-  enumValues(includeDeprecated: true) {
-    name
-    description
-    isDeprecated
-    deprecationReason
-  }
-  possibleTypes {
-    ...TypeRef
-  }
-}
-
-fragment InputValue on __InputValue {
-  name
-  description
-  type {
-    ...TypeRef
-  }
-  defaultValue
-}
-
-fragment TypeRef on __Type {
-  kind
-  name
-  ofType {
-    kind
-    name
-    ofType {
-      kind
-      name
-      ofType {
-        kind
-        name
-        ofType {
-          kind
-          name
-          ofType {
-            kind
-            name
-            ofType {
-              kind
-              name
-              ofType {
-                kind
-                name
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-`.trim()
